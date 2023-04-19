@@ -1,5 +1,6 @@
 package com.pratik.springboot.rest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.pratik.springboot.rest.entity.ProductEntity;
@@ -9,14 +10,17 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -46,6 +50,16 @@ public class ProductRestControllerMvcTest {
         mockMvc.perform(get("/pratik/products").contextPath("/pratik")).andExpect(status().isOk())
                 .andExpect(content().json(writer.writeValueAsString(products)));
 
+    }
+
+    @Test
+    public void testCreateProduct() throws Exception {
+        ProductEntity product = buildProduct();
+        when (repository.save(any())).thenReturn(product);
+
+        ObjectWriter writer = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        mockMvc.perform(post("/pratik/products").contextPath("/pratik").
+                contentType(MediaType.APPLICATION_JSON).content(writer.writeValueAsString(product))).andExpect(status().isOk());
     }
 
     private ProductEntity buildProduct() {
