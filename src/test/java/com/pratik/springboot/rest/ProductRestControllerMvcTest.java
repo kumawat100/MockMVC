@@ -59,7 +59,8 @@ public class ProductRestControllerMvcTest {
 
         ObjectWriter writer = new ObjectMapper().writer().withDefaultPrettyPrinter();
         mockMvc.perform(post("/pratik/products").contextPath("/pratik").
-                contentType(MediaType.APPLICATION_JSON).content(writer.writeValueAsString(product))).andExpect(status().isOk());
+                contentType(MediaType.APPLICATION_JSON).content(writer.writeValueAsString(product))).andExpect(status().isOk())
+                .andExpect(content().json(writer.writeValueAsString(product)));
     }
 
     private ProductEntity buildProduct() {
