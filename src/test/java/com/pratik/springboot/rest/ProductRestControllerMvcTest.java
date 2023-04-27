@@ -18,9 +18,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -61,6 +61,25 @@ public class ProductRestControllerMvcTest {
         mockMvc.perform(post("/pratik/products").contextPath("/pratik").
                 contentType(MediaType.APPLICATION_JSON).content(writer.writeValueAsString(product))).andExpect(status().isOk())
                 .andExpect(content().json(writer.writeValueAsString(product)));
+    }
+
+    @Test
+    public void testUpdateProduct() throws Exception {
+        ProductEntity product = buildProduct();
+        product.setPrice(100000);
+        when (repository.save(any())).thenReturn(product);
+
+        ObjectWriter writer = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        mockMvc.perform(put("/pratik/products").contextPath("/pratik").
+                        contentType(MediaType.APPLICATION_JSON).content(writer.writeValueAsString(product))).andExpect(status().isOk())
+                .andExpect(content().json(writer.writeValueAsString(product)));
+    }
+
+    @Test
+    public void testDeleteProduct() throws Exception {
+        ProductEntity product = buildProduct();
+        doNothing().when(repository).deleteById((product.getId()));
+        mockMvc.perform(delete("/pratik/products/1").contextPath("/pratik")).andExpect(status().isOk());
     }
 
     private ProductEntity buildProduct() {
